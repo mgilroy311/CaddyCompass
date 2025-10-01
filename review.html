@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Course Caddy – Golfer Review</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    :root{ --brand:#003C21; --ink:#111; --bg:#f8faf9; --card:#fff; --ring:#d1d5db; }
+
+    /* Page shell (keeps your site look) */
+    body{ margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    header{ background:var(--brand); }
+    .nav{ max-width:1200px; margin:0 auto; padding:.75rem 1rem; display:flex; justify-content:space-between; align-items:center; }
+    .nav-left{ display:flex; align-items:center; gap:.5rem; }
+    .logo-img{ height:48px; width:auto; }
+    .logo-text{ font-weight:800; font-size:1.25rem; color:#fff; letter-spacing:1px; }
+    .tabs{ display:flex; gap:1rem; }
+    .tab{ padding:.5rem 1rem; border-radius:999px; border:none; color:#fff; text-decoration:none; font-weight:600; }
+    .tab.active{ background:#fff; color:var(--brand); }
+
+    main{ max-width:1000px; margin:1rem auto; padding:1rem; }
+    .card{ background:var(--card); border:1px solid var(--ring); border-radius:12px; }
+    .pad{ padding:1rem; }
+
+    /* Page title */
+    .page-title{
+      font-size:2.5rem; font-weight:800; color:var(--brand);
+      text-align:center; margin:1rem 0 1.5rem 0; text-shadow:0 2px 0 rgba(0,0,0,.06);
+    }
+
+    /* Review layout */
+    .review-card{ background:#fff; }
+    .review-grid{ display:grid; grid-template-columns:360px 1fr; gap:1.25rem; }
+    .left{ display:grid; gap:.9rem; align-content:start; }
+    label{ font-weight:700; color:var(--brand); display:inline-block; margin-bottom:.25rem; }
+    .field{ display:flex; align-items:center; gap:.6rem; }
+    .control{ flex:1 1 auto; padding:.5rem; border:1px solid var(--ring); border-radius:10px; background:#fff; }
+
+    .review-photo{
+      width:100%; max-width:560px; height:280px; object-fit:cover;
+      border-radius:10px; border:1px solid var(--ring); background:#eee; display:block;
+    }
+    .preview-caption{ margin-top:.5rem; font-weight:700; font-size:1.05rem; }
+    .subcaption{ font-size:1.05rem; font-weight:700; margin-top:.15rem; }
+    .hint{ color:#666; font-size:.9rem; }
+
+    textarea#comments{
+      width:100%; min-height:180px; border:1px solid var(--ring); border-radius:10px;
+      padding:.75rem; resize:vertical; background:#fff;
+    }
+
+    .actions{ display:flex; gap:.75rem; margin-top:.5rem; align-items:center; }
+    .btn{ padding:.6rem 1.1rem; border:1px solid var(--ring); border-radius:10px; cursor:pointer; font-weight:700; background:#fff; }
+    .btn.primary{ background:var(--brand); color:#fff; border-color:var(--brand); }
+    .btn.danger{ background:#fff5f5; border-color:#f0caca; }
+
+    /* Star inputs (0.5 steps) */
+    .stars-input{ display:flex; align-items:center; gap:.35rem; --size:22px; }
+    .star-btn{ font-size:var(--size); line-height:1; cursor:pointer; user-select:none; }
+    .star-btn.full{ color:#f4c430; }    /* gold */
+    .star-btn.empty{ color:#d9d9d9; }
+    .star-btn.half{
+      background:linear-gradient(90deg,#f4c430 50%,#d9d9d9 50%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .rating-value{ min-width:40px; text-align:center; font-weight:600; }
+
+    @media (max-width: 900px){
+      .review-grid{ grid-template-columns:1fr; }
+      .review-photo{ height:240px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <nav class="nav">
+      <div class="nav-left">
+        <img src="assets/photos/CClogo.png" alt="Caddy Compass Logo" class="logo-img" />
+        <span class="logo-text">CADDY COMPASS</span>
+      </div>
+      <div class="tabs">
+        <a href="index.html" class="tab">Home</a>
+        <a href="holes.html" class="tab">Signature Holes</a>
+        <a href="courses.html" class="tab">Courses</a>
+        <a href="review.html" class="tab active">Review</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1 class="page-title">Golfer Review</h1>
+
+    <section class="card pad review-card">
+      <div class="review-grid">
+        <!-- Left: form -->
+        <div class="left">
+          <div>
+            <label for="course">Course</label>
+            <div class="field">
+              <select id="course" class="control"></select>
+            </div>
+          </div>
+
+          <div>
+            <label for="hole">Hole</label>
+            <div class="field">
+              <select id="hole" class="control"></select>
+            </div>
+          </div>
+
+          <div>
+            <label>Fun</label>
+            <div class="field">
+              <div id="funStars" class="stars-input"></div>
+              <div id="funVal" class="rating-value">0.0</div>
+            </div>
+          </div>
+
+          <div>
+            <label>Difficulty</label>
+            <div class="field">
+              <div id="diffStars" class="stars-input"></div>
+              <div id="diffVal" class="rating-value">0.0</div>
+            </div>
+          </div>
+
+          <div>
+            <label>Maintenance</label>
+            <div class="field">
+              <div id="maintStars" class="stars-input"></div>
+              <div id="maintVal" class="rating-value">0.0</div>
+            </div>
+          </div>
+
+          <div>
+            <label>Yardage</label>
+            <div class="field">
+              <div id="yardageDisplay" class="control" style="font-weight:700;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: preview -->
+        <div class="right">
+          <img id="previewImg" class="review-photo" src="assets/photos/nophoto.png" alt="Course hole preview" />
+          <div id="previewTitle" class="preview-caption">—</div>
+          <div id="previewHole" class="subcaption">—</div>
+          <div id="previewHint" class="hint">Choose a course and hole to preview the photo and info.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.2rem;">
+        <label for="comments">Comments</label>
+        <textarea id="comments" placeholder="Share your thoughts about this hole… (wind? green speed? sight lines?)"></textarea>
+      </div>
+
+      <div class="actions">
+        <button id="saveBtn" class="btn primary">Submit Review</button>
+        <button id="resetBtn" class="btn danger">Reset</button>
+        <div id="saveNote" class="hint"></div>
+      </div>
+    </section>
+  </main>
+
+    <footer class="site-footer">
+    <div class="footer-top">
+      <div class="ft-col">
+        <h4>Information</h4>
+        <p><a href="#">Privacy policy</a> / <a href="#">Terms of use</a></p>
+      </div>
+
+      <div class="ft-col center">
+        <h4><button class="back-to-top" type="button">Back to top.</button></h4>
+       
+      </div>
+
+      <div class="ft-col right">
+        <h4>Stay connected</h4>
+        <form id="newsletter" class="newsletter" novalidate>
+          <input type="email" placeholder="*Email" aria-label="Email" required />
+          <button type="submit">Join</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-divider"></div>
+          <div class="ft-col center">
+       
+        <div class="social">
+          <a href="#" aria-label="X / Twitter" class="ico">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18.244 2H21l-6.478 7.41L22 22h-6.778l-5.3-6.9L3.7 22H1l6.956-7.956L2 2h6.778l4.74 6.176L18.244 2Zm-1.188 18h1.66L7.06 4H5.4l11.656 16Z"/></svg>
+          </a>
+          <a href="#" aria-label="Facebook" class="ico">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07C2 17.08 5.66 21.2 10.44 22v-7.02H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.62.77-1.62 1.56V12h2.76l-.44 2.98h-2.32V22C18.34 21.2 22 17.08 22 12.07Z"/></svg>
+          </a>
+          <a href="#" aria-label="Instagram" class="ico">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-5C8.14 2 7.6 2.02 6.1 2.1 4.6 2.18 3.52 2.43 2.63 2.83A4.93 4.93 0 0 0 .83 4.63C.43 5.52.18 6.6.1 8.1.02 9.6 0 10.14 0 14s.02 4.4.1 5.9c.08 1.5.33 2.58.73 3.47.41.89 1.19 1.67 2.08 2.07.89.41 1.97.66 3.47.74 1.5.08 2.04.1 5.9.1s4.4-.02 5.9-.1c1.5-.08 2.58-.33 3.47-.74a4.93 4.93 0 0 0 1.8-1.8c.4-.89.65-1.97.73-3.47.08-1.5.1-2.04.1-5.9s-.02-4.4-.1-5.9c-.08-1.5-.33-2.58-.73-3.47a4.93 4.93 0 0 0-1.8-1.8c-.89-.4-1.97-.65-3.47-.73C16.4 2.02 15.86 2 12 2Zm0 3c3.8 0 4.25.02 5.75.1 1.24.06 1.91.26 2.35.43.59.23 1 .5 1.43.93.42.42.7.84.93 1.43.17.44.37 1.11.43 2.35.08 1.5.1 1.95.1 5.75s-.02 4.25-.1 5.75c-.06 1.24-.26 1.91-.43 2.35a3 3 0 0 1-.93 1.43 3 3 0 0 1-1.43.93c-.44.17-1.11.37-2.35.43-1.5.08-1.95.1-5.75.1s-4.25-.02-5.75-.1c-1.24-.06-1.91-.26-2.35-.43a3 3 0 0 1-1.43-.93 3 3 0 0 1-.93-1.43c-.17-.44-.37-1.11-.43-2.35C2.02 16.25 2 15.8 2 12s.02-4.25.1-5.75c.06-1.24.26-1.91.43-2.35.23-.59.5-1 .93-1.43.42-.42.84-.7 1.43-.93.44-.17 1.11-.37 2.35-.43C7.75 5.02 8.2 5 12 5Zm6.5 1.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>
+          </a>
+        </div>
+      </div>
+
+    <div class="footer-bottom">
+      <div class="designer">Designed by Michael Gilroy</div>
+      <div class="copyright">© Copyright 2025 Caddy Compass. All rights reserved.</div>
+      <div class="contact">
+        <div class="contact-title">Contact Info</div>
+        <div>Ph: 555-555-5555</div>
+        <div>Email: Gilroymj@email.sc.edu</div>
+        <div>Myrtle Beach, SC</div>
+      </div>
+      <img class="footer-logo" src="assets/photos/CClogo.png" alt="Caddy Compass" />
+    </div>
+  </footer>
+
+  <script>
+    const CSV_HOLES = 'assets/courses_holes.csv';   // per-hole master (18 rows per course)
+    const CSV_REVIEWS = 'assets/reviews.csv';       // append-only crowd ratings
+
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    const parseNum = v => { const n = parseFloat(v); return isFinite(n) ? n : null; };
+
+    let HOLES = [];        // parsed rows from courses_holes.csv
+    let GROUPED = {};      // { Course: [rows...] }
+    let FUN, DIFF, MAINT;  // star widgets
+    let csvCache = null;   // in-memory reviews.csv text
+    let fileHandle = null; // File System Access handle
+
+    /* ---------- Star input (0..5 in 0.5 steps) ---------- */
+    function buildStarInput(container, onChange){
+      container.innerHTML = '';
+      for(let i=1;i<=5;i++){
+        const span = document.createElement('span');
+        span.className = 'star-btn empty';
+        span.textContent = '★';
+        span.dataset.index = i; // 1..5
+        container.appendChild(span);
+      }
+      let value = 0.0;
+      function render(){
+        const full = Math.floor(value);
+        const half = (value - full) === 0.5;
+        [...container.children].forEach((el, idx)=>{
+          const i = idx+1;
+          el.classList.remove('full','half','empty');
+          if(i <= full) el.classList.add('full');
+          else if(i === full+1 && half) el.classList.add('half');
+          else el.classList.add('empty');
+        });
+      }
+      function setValue(v){
+        value = Math.max(0, Math.min(5, Math.round(v*2)/2));
+        render(); onChange(value);
+      }
+      container.addEventListener('click', e=>{
+        if(!e.target.classList.contains('star-btn')) return;
+        const rect = e.target.getBoundingClientRect();
+        const idx = +e.target.dataset.index;
+        const left = (e.clientX - rect.left) < rect.width/2;
+        const v = idx - (left ? 0.5 : 0);
+        setValue(v);
+      });
+      return { set:setValue, get:()=>value, render };
+    }
+
+    /* ---------- CSV helpers for reviews.csv ---------- */
+    const CSV_HEADER = 'course,hole,fun,difficulty,maintenance,comments,timestamp\n';
+
+    async function ensureCsvLoaded(){
+      if (csvCache !== null) return csvCache;
+      try{
+        const res = await fetch(CSV_REVIEWS, { cache:'no-store' });
+        if(!res.ok){ csvCache = CSV_HEADER; return csvCache; }
+        const txt = await res.text();
+        csvCache = txt.trim().length ? txt : CSV_HEADER;
+      }catch{
+        csvCache = CSV_HEADER;
+      }
+      return csvCache;
+    }
+    function csvEscape(s=''){
+      const v = String(s).replace(/\r?\n/g,' ').trim();
+      return /[",]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v;
+    }
+    function toCsvRow(rec){
+      return [
+        rec.course,
+        rec.hole,
+        rec.fun,
+        rec.difficulty,
+        rec.maintenance,
+        rec.comments,
+        new Date(rec.ts).toISOString()
+      ].map(csvEscape).join(',') + '\n';
+    }
+    async function pickCsvFile(){
+      if(!window.showOpenFilePicker) return null;
+      const [h] = await showOpenFilePicker({
+        multiple:false,
+        types:[{description:'CSV', accept:{'text/csv':['.csv']}}]
+      });
+      return h;
+    }
+    async function appendToRealFile(rowText){
+      if(!fileHandle) fileHandle = await pickCsvFile(); // user picks assets/reviews.csv once
+      if(!fileHandle) throw new Error('No file handle');
+      const file = await fileHandle.getFile();
+      let text = await file.text();
+      if(!text.trim().length) text = CSV_HEADER;
+      text += rowText;
+      const writable = await fileHandle.createWritable();
+      await writable.write(text);
+      await writable.close();
+    }
+    function downloadCsv(text){
+      const blob = new Blob([text], { type:'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'reviews.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+    async function appendReviewToCsv(record){
+      await ensureCsvLoaded();
+      const row = toCsvRow(record);
+      try{
+        await appendToRealFile(row);      // direct write (Chrome/Edge on localhost/https)
+        csvCache += row;
+        $('#saveNote').textContent = 'Saved to assets/reviews.csv ✔';
+      }catch{
+        csvCache += row;                  // fallback: download full updated CSV
+        downloadCsv(csvCache);
+        $('#saveNote').textContent = 'Downloaded updated reviews.csv — place it in /assets';
+      }
+    }
+
+    /* ---------- Load & group courses_holes.csv ---------- */
+    async function loadHoles(){
+      const res = await fetch(CSV_HOLES, { cache:'no-store' });
+      if(!res.ok) throw new Error('Could not load ' + CSV_HOLES);
+      const txt = await res.text();
+      HOLES = Papa.parse(txt, { header:true, skipEmptyLines:true }).data;
+      GROUPED = HOLES.reduce((acc,r)=>{
+        const c = r.Course || r.course || '';
+        if(!c) return acc;
+        (acc[c] = acc[c] || []).push(r);
+        return acc;
+      }, {});
+    }
+
+    function fillCourseSelect(){
+      const sel = $('#course');
+      sel.innerHTML = '';
+      const courses = Object.keys(GROUPED).sort((a,b)=>a.localeCompare(b));
+      courses.forEach(c=>{
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        sel.appendChild(opt);
+      });
+      if(courses.length) sel.value = courses[0];
+      fillHoleSelect();
+    }
+    function fillHoleSelect(){
+      const course = $('#course').value;
+      const list = (GROUPED[course]||[]).slice().sort((a,b)=>parseNum(a.Hole)-parseNum(b.Hole));
+      const sel = $('#hole'); sel.innerHTML = '';
+      list.forEach(r=>{
+        const opt = document.createElement('option');
+        opt.value = r.Hole; opt.textContent = r.Hole;
+        sel.appendChild(opt);
+      });
+      if(list.length) sel.value = list[0].Hole;
+      updatePreview();
+    }
+    function currentRow(){
+      const c = $('#course').value, h = $('#hole').value;
+      const rows = GROUPED[c] || [];
+      return rows.find(r => String(r.Hole) === String(h)) || null;
+    }
+    function updatePreview(){
+      const r = currentRow();
+      if(!r){
+        $('#previewImg').src = 'assets/photos/nophoto.png';
+        $('#previewTitle').textContent = '—';
+        $('#previewHole').textContent = '—';
+        $('#yardageDisplay').textContent = '—';
+        return;
+      }
+      const p = (r.photo||'').replace(/^assets\//i,'').replace(/^photos\//i,'');
+      const path = 'assets/photos/' + (p || 'nophoto.png');
+      $('#previewImg').src = path;
+      $('#previewImg').onerror = () => { $('#previewImg').src = 'assets/photos/nophoto.png'; };
+      $('#previewTitle').textContent = r.Course || '—';
+      $('#previewHole').textContent  = `Hole ${r.Hole || '—'}`;
+      $('#yardageDisplay').textContent = r.yardage || '—';
+    }
+
+    /* ---------- Save & reset ---------- */
+    async function saveReview(){
+      const row = currentRow();
+      if(!row){ alert('Please choose a course and hole.'); return; }
+      const record = {
+        course: $('#course').value,
+        hole: $('#hole').value,
+        cost: ($('#cost')?.value || '').trim(),  // not saved to reviews.csv (you can add if wanted)
+        fun: FUN.get(),
+        difficulty: DIFF.get(),
+        maintenance: MAINT.get(),
+        comments: ($('#comments').value || '').trim(),
+        yardage: row.yardage || null,          // not saved to reviews.csv
+        ts: Date.now()
+      };
+
+      // Save to localStorage too (handy for testing)
+      const key = 'caddy_reviews';
+      const list = JSON.parse(localStorage.getItem(key)||'[]');
+      list.push(record);
+      localStorage.setItem(key, JSON.stringify(list));
+
+      // Append to assets/reviews.csv (or download updated CSV)
+      await appendReviewToCsv(record);
+
+      $('#saveNote').textContent ||= 'Saved ✔';
+      setTimeout(()=> $('#saveNote').textContent = '', 2500);
+    }
+
+    function resetForm(){
+      if (document.getElementById('cost')) document.getElementById('cost').value = '';
+      $('#comments').value = '';
+      FUN.set(0); DIFF.set(0); MAINT.set(0);
+      $('#funVal').textContent = '0.0';
+      $('#diffVal').textContent = '0.0';
+      $('#maintVal').textContent = '0.0';
+    }
+
+    /* ---------- Boot ---------- */
+    (async()=>{
+      // Build star widgets
+      FUN  = buildStarInput($('#funStars'),  v => $('#funVal').textContent  = v.toFixed(1));
+      DIFF = buildStarInput($('#diffStars'), v => $('#diffVal').textContent = v.toFixed(1));
+      MAINT= buildStarInput($('#maintStars'),v => $('#maintVal').textContent= v.toFixed(1));
+      FUN.render(); DIFF.render(); MAINT.render();
+
+      // Load per-hole data
+      await loadHoles();
+      fillCourseSelect();
+
+      // Wire events
+      $('#course').addEventListener('change', fillHoleSelect);
+      $('#hole').addEventListener('change', updatePreview);
+      $('#saveBtn').addEventListener('click', saveReview);
+      $('#resetBtn').addEventListener('click', resetForm);
+    })();
+  </script>
+</body>
+</html>
