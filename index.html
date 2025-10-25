@@ -117,6 +117,24 @@
         No photos found yet. Add photos to <code>assets/photos/</code> and set the <b>photo</b> column in <code>assets/courses_holes.csv</code>.
       </div>
     </section>
+<!-- Golf Quotes -->
+    <section id="daily-quote" class="quote-card" aria-labelledby="daily-quote-title">
+      <h2 id="daily-quote-title">Golfer’s Quote of the Moment</h2>
+
+      <!-- Reserve space to reduce CLS -->
+      <blockquote class="quote-body" aria-live="polite">
+        <span id="quote-text">Loading quote…</span>
+        <cite id="quote-author" class="quote-author"></cite>
+      </blockquote>
+
+  <div class="quote-actions">
+    <button id="new-quote-btn" type="button" aria-label="Show another quote">
+      New Quote
+    </button>
+  </div>
+</section>
+
+<script defer src="js/quotes.js"></script>
 
     <section class="grid" style="margin-top:1rem">
       <div class="col-4 card pad">

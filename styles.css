@@ -1,0 +1,244 @@
+/* === Global Footer ===
+   Brand tokens + full-bleed footer shell */
+.site-footer{
+  --footer-bg:   #083d2e;
+  --footer-bg-2: #0b4a38;
+  --footer-ink:  #e8f4ef;
+  --footer-muted:#bfd4cc;
+
+  color: var(--footer-ink);
+  background: var(--footer-bg);
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,.08);
+
+  /* edge-to-edge even when the page uses a centered max-width wrapper */
+  max-width: none;
+  width: 100svw;
+  margin-left: calc(50% - 50svw);
+  margin-right: calc(50% - 50svw);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ===== Top row ===== */
+.footer-top{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem clamp(1rem, 3vw, 1.5rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Column text/link treatments */
+.ft-col h4{ margin:0 0 .5rem 0; font-weight:700; }
+.ft-col p{ margin:.25rem 0 0; color: var(--footer-muted); }
+.ft-col a{
+  color: var(--footer-ink);
+  text-decoration: none;
+  outline: none;
+}
+.ft-col a:hover{ text-decoration: underline; }
+.ft-col a:focus-visible{
+  outline: 2px solid #9fe0c9;
+  outline-offset: 2px;
+}
+
+/* Alignment utilities used inside footer columns */
+.ft-col.center{ text-align: center; }
+.ft-col.right { text-align: right; }
+
+/* Newsletter signup */
+.newsletter{
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+}
+.newsletter input{
+  width: min(360px, 100%);
+  padding: .75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #274f43;
+  color: #fff;
+}
+.newsletter input::placeholder{ color:#cfe3db; }
+.newsletter button{
+  padding: .75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: #315f51;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+.newsletter button:hover{ background: #3b6f60; }
+.newsletter button:focus-visible{
+  outline: 2px solid #9fe0c9;
+  outline-offset: 2px;
+}
+
+/* Social icons */
+.social{
+  display:flex;
+  gap:.75rem;
+  justify-content:center;
+  margin-top:.35rem;
+}
+.ico{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:999px;
+  background:#315f51; color:#fff;
+}
+.ico:hover{ background:#3b6f60; }
+.ico:focus-visible{
+  outline: 2px solid #9fe0c9;
+  outline-offset: 2px;
+}
+
+/* Full-width divider (edge-to-edge line) */
+.footer-divider{
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  width: 100svw;
+  margin: 0 calc(-50svw + 50%);
+}
+
+/* ===== Bottom row ===== */
+.footer-bottom{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: .8rem clamp(1rem, 3vw, 1.5rem) 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.footer-logo{ height:46px; width:auto; opacity:.95; }
+.designer{  font-size:.85rem; color:#cfe3db; }
+.copyright{ text-align:center; font-size:.9rem; }
+.contact{   text-align:right; font-size:.95rem; line-height:1.3; }
+.contact .contact-title{ font-weight:700; margin-bottom:.25rem; }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  .footer-top{
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+  .ft-col.center,
+  .ft-col.right{ text-align: left; }
+  .newsletter{ justify-content: flex-start; }
+
+  .footer-bottom{
+    grid-template-columns: 1fr;
+    text-align: left;
+    row-gap: .5rem;
+  }
+  .copyright{ text-align: left; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .newsletter button,
+  .ico { transition: none; }
+}
+
+/* === Featured Holes (index) === */
+#featured{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+#featured .hole-card{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#featured .hole-img{
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* === Lightbox modal helper (index/holes/courses) === */
+.modal{ display:none; }
+.modal.show{ display:flex; }
+
+/* === Courses table (courses) === */
+.course-thumb{
+  width: 320px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--ring, #d1d5db);
+  display: block;
+  background: #eee;
+}
+#coursesTable th:first-child,
+#coursesTable td:first-child{ width: 360px; }
+#coursesTable td{ vertical-align: middle; }
+
+/* Quote card styling */
+.quote-card {
+  border: 2px solid #003C21;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  background: #f7f9f8;
+  max-width: 900px;
+  margin: 1.5rem auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.quote-card h2 {
+  margin: 0 0 0.5rem 0;
+  color: #003C21;
+  font-size: 1.25rem;
+}
+
+.quote-body {
+  margin: 0.25rem 0 0.75rem 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  /* reserve space ~2.5 lines to reduce layout shift jitter */
+  min-height: 3.5em;
+}
+
+.quote-body #quote-text::before,
+.quote-body #quote-text::after {
+  content: "“" attr(data-left) "";
+}
+
+.quote-body #quote-text::before { content: "“"; }
+.quote-body #quote-text::after  { content: "”"; }
+
+.quote-author {
+  display: block;
+  margin-top: 0.25rem;
+  color: #2c3e50;
+  font-style: normal;
+  opacity: 0.85;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#new-quote-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #003C21;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+#new-quote-btn:focus-visible {
+  outline: 3px solid #2ecc71;
+  outline-offset: 2px;
+}
