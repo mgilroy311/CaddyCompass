@@ -180,3 +180,65 @@
 #coursesTable th:first-child,
 #coursesTable td:first-child{ width: 360px; }
 #coursesTable td{ vertical-align: middle; }
+
+/* Quote card styling */
+.quote-card {
+  border: 2px solid #003C21;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  background: #f7f9f8;
+  max-width: 900px;
+  margin: 1.5rem auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.quote-card h2 {
+  margin: 0 0 0.5rem 0;
+  color: #003C21;
+  font-size: 1.25rem;
+}
+
+.quote-body {
+  margin: 0.25rem 0 0.75rem 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  /* reserve space ~2.5 lines to reduce layout shift jitter */
+  min-height: 3.5em;
+}
+
+.quote-body #quote-text::before,
+.quote-body #quote-text::after {
+  content: "“" attr(data-left) "";
+}
+
+.quote-body #quote-text::before { content: "“"; }
+.quote-body #quote-text::after  { content: "”"; }
+
+.quote-author {
+  display: block;
+  margin-top: 0.25rem;
+  color: #2c3e50;
+  font-style: normal;
+  opacity: 0.85;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#new-quote-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #003C21;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+#new-quote-btn:focus-visible {
+  outline: 3px solid #2ecc71;
+  outline-offset: 2px;
+}
