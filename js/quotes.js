@@ -1,6 +1,3 @@
-// js/quotes.js
-
-// A small, high-quality set of golf quotes with attributions
 const golf_quotes = [
   { text: "The more I practice, the luckier I get.", author: "Gary Player" },
   { text: "Golf is a game of inches. The most important are the six inches between your ears.", author: "Arnold Palmer" },
@@ -13,23 +10,20 @@ const golf_quotes = [
   { text: "Putts get real difficult the day they hand out the money.", author: "Lee Trevino" },
   { text: "The most important shot in golf is the next one.", author: "Ben Hogan" },
   { text: "Competitive golf is played mainly on a five-inch course… the space between your ears.", author: "Bobby Jones" },
-  { text: "Don’t be too proud to take lessons. I’m not.", author: "Jack Nicklaus" }
-];
+  { text: "Don’t be too proud to take lessons. I’m not.", author: "Jack Nicklaus" }];
 
 let last_index = -1;
 
-/** Returns a random index that is not equal to last_index */
+
 function get_random_index() {
   if (golf_quotes.length <= 1) return 0;
   let idx = Math.floor(Math.random() * golf_quotes.length);
   if (idx === last_index) {
-    idx = (idx + 1) % golf_quotes.length;
-  }
+    idx = (idx + 1) % golf_quotes.length;}
   last_index = idx;
-  return idx;
-}
+  return idx;}
 
-/** Renders a random quote into the DOM */
+
 function render_quote() {
   const quote_text_el = document.getElementById("quote-text");
   const quote_author_el = document.getElementById("quote-author");
@@ -37,10 +31,9 @@ function render_quote() {
 
   const q = golf_quotes[get_random_index()];
   quote_text_el.textContent = q.text;
-  quote_author_el.textContent = `— ${q.author}`;
-}
+  quote_author_el.textContent = `— ${q.author}`;}
 
-/** Wire up events once DOM is ready */
+
 document.addEventListener("DOMContentLoaded", () => {
   // Initial quote on load
   render_quote();
@@ -51,7 +44,5 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", render_quote);
     // Keyboard support
     btn.addEventListener("keyup", (e) => {
-      if (e.key === "Enter" || e.key === " ") render_quote();
-    });
-  }
-});
+      if (e.key === "Enter" || e.key === " ") render_quote(); });}});
+
