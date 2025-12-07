@@ -348,3 +348,17 @@ header {
   border-radius: 10px;
   margin-bottom: 1rem;
 }
+/* Featured hole cards */
+.hole-card {
+  overflow: hidden;      /* keeps images inside rounded corners */
+  border-radius: 12px;   /* matches your card radius */
+}
+
+/* Featured images */
+.hole-img {
+  width: 100%;
+  height: 180px;         /* or your preferred height */
+  object-fit: cover;     /* prevents stretching and overflow */
+  display: block;        /* removes inline gap */
+  border-radius: 0;      /* allow parent to control the rounding */
+}
