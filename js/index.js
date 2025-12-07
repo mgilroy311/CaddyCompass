@@ -1,23 +1,23 @@
-// =========================================================
-// Utility Functions
-// =========================================================
+/* =========================================================
+   Utility Helpers
+   ========================================================= */
 
-// Shortcut for querySelector
-const $ = (selector) => document.querySelector(selector);
+// Shorthand for querySelector
+const $ = (sel) => document.querySelector(sel);
 
-// Load CSV using PapaParse
+// Load CSV with PapaParse
 async function loadCSV(path) {
   try {
     const response = await fetch(path);
     const text = await response.text();
     return Papa.parse(text, { header: true, skipEmptyLines: true }).data;
-  } catch (error) {
-    console.error("CSV load error:", error);
+  } catch (err) {
+    console.error("CSV load error:", err);
     return [];
   }
 }
 
-// Clean photo paths from CSV
+// Clean inconsistent CSV photo paths
 function cleanPhotoPath(value) {
   return (value || "")
     .trim()
@@ -25,47 +25,48 @@ function cleanPhotoPath(value) {
     .replace(/^photos\//i, "");
 }
 
-// Random shuffle for selecting featured holes
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
+// Shuffle array (for random featured picks)
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return array;
+  return arr;
 }
 
-// Ensure each course only appears once in the featured section
+// Prevent a course from appearing more than once
 function uniqueByCourse(rows) {
   const seen = new Set();
-  const result = [];
+  const out = [];
 
-  for (const row of rows) {
-    const courseKey = (row.Course || "").trim().toLowerCase();
-    if (!courseKey || seen.has(courseKey)) continue;
-
-    seen.add(courseKey);
-    result.push(row);
+  for (const r of rows) {
+    const key = (r.Course || "").trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(r);
   }
-  return result;
+  return out;
 }
 
-// =========================================================
-// Featured Signature Holes Rendering
-// =========================================================
+
+/* =========================================================
+   Featured Signature Holes Rendering (Home Page)
+   ========================================================= */
 
 function renderFeatured(rows) {
-  const featuredBox = $("#featured");
+  const container = $("#featured");
   const noPhotosMsg = $("#noPhotos");
-  featuredBox.innerHTML = "";
+  container.innerHTML = "";
 
-  // Filter rows that actually contain images
-  const withPhotos = rows.filter((r) => {
-    const cleanPath = cleanPhotoPath(r.photo);
-    const filename = cleanPath.split("/").pop()?.toLowerCase();
-    return filename && filename !== "nophoto.png";
+  // Only rows with usable photos
+  const validPhotos = rows.filter((r) => {
+    const cleaned = cleanPhotoPath(r.photo);
+    const file = cleaned.split("/").pop()?.toLowerCase();
+    return file && file !== "nophoto.png";
   });
 
-  const picks = shuffle(uniqueByCourse(withPhotos)).slice(0, 3);
+  // Random 3 distinct courses
+  const picks = shuffle(uniqueByCourse(validPhotos)).slice(0, 3);
 
   if (!picks.length) {
     noPhotosMsg.style.display = "block";
@@ -79,9 +80,11 @@ function renderFeatured(rows) {
     card.className = "hole-card";
 
     card.innerHTML = `
-      <img class="hole-img" loading="lazy"
-        src="${imgSrc}"
-        alt="${r.Course || ""} – Hole ${r.Hole || ""}">
+      <img class="hole-img"
+           src="${imgSrc}"
+           data-large="${imgSrc}"
+           loading="lazy"
+           alt="${r.Course || ""} – Hole ${r.Hole || ""}">
       <div class="hole-title">${r.Course || ""}</div>
       <div class="hole-sub">
         Hole ${r.Hole || ""}${
@@ -90,71 +93,76 @@ function renderFeatured(rows) {
       </div>
     `;
 
-    // When image clicked → open modal
-    card.querySelector(".hole-img").addEventListener("click", function () {
-      const modal = $("#photoModal");
-      const modalImg = $("#modalImg");
-
-      modalImg.src = imgSrc;
-      modal.classList.add("show");
-      modal.setAttribute("aria-hidden", "false");
+    // Click → open modal
+    card.querySelector(".hole-img").addEventListener("click", () => {
+      $("#modalImg").src = imgSrc;
+      $("#photoModal").classList.add("show");
+      $("#photoModal").setAttribute("aria-hidden", "false");
     });
 
-    featuredBox.appendChild(card);
+    container.appendChild(card);
   });
 }
 
-// =========================================================
-// Modal Lightbox Close Events
-// =========================================================
 
-document.addEventListener("click", (event) => {
+/* =========================================================
+   Lightbox Modal Controls
+   ========================================================= */
+
+document.addEventListener("click", (e) => {
   const modal = $("#photoModal");
 
-  if (event.target.classList.contains("modal-close") || event.target === modal) {
+  // Close button or clicking the backdrop
+  if (
+    e.target.classList.contains("modal-close") ||
+    e.target === modal
+  ) {
     modal.classList.remove("show");
     modal.setAttribute("aria-hidden", "true");
     $("#modalImg").src = "";
   }
 });
 
-document.addEventListener("keydown", (event) => {
-  const modal = $("#photoModal");
-  if (event.key === "Escape" && modal.classList.contains("show")) {
-    modal.classList.remove("show");
+// Escape key closes modal
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && $("#photoModal").classList.contains("show")) {
+    $("#photoModal").classList.remove("show");
     $("#modalImg").src = "";
   }
 });
 
-// =========================================================
-// Back to Top Button
-// =========================================================
 
-document.addEventListener("click", (event) => {
-  if (event.target.closest(".back-to-top")) {
+/* =========================================================
+   Back to Top Button
+   ========================================================= */
+
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".back-to-top")) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 });
 
-// =========================================================
-// Newsletter Form (non-functional placeholder)
-// =========================================================
 
-const newsletterForm = document.getElementById("newsletter");
+/* =========================================================
+   Newsletter (simple placeholder)
+   ========================================================= */
 
-if (newsletterForm) {
-  newsletterForm.addEventListener("submit", (event) => {
-    event.preventDefault();
+const newsletter = $("#newsletter");
+
+if (newsletter) {
+  newsletter.addEventListener("submit", (e) => {
+    e.preventDefault();
     alert("Thanks for joining our newsletter!");
-    newsletterForm.reset();
+    newsletter.reset();
   });
 }
 
-// =========================================================
-// INITIALIZE PAGE ON LOAD
-// =========================================================
+
+/* =========================================================
+   Initialize Home Page
+   ========================================================= */
 
 (async () => {
-  const holeRows = await loadCSV("assets/courses_holes.csv");
-  renderFeatured(holeRows);
+  const rows = await loadCSV("assets/courses_holes.csv");
+  renderFeatured(rows);
 })();
