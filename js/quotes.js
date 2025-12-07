@@ -1,3 +1,7 @@
+/* =========================================================
+   Quotes
+   ========================================================= */
+
 const golf_quotes = [
   { text: "The more I practice, the luckier I get.", author: "Gary Player" },
   { text: "Golf is a game of inches. The most important are the six inches between your ears.", author: "Arnold Palmer" },
